@@ -102,36 +102,6 @@ const ProductCard: React.FC<IProductProps> = ({ id, name, image, description, ca
                     </CardContent>
                 </StyledCard>
             </Tooltip>
-
-            {/*<Dialog open={isModalOpen} onClose={toggleModal} maxWidth="md" fullWidth>*/}
-            {/*    <DialogContent>*/}
-            {/*        <Typography variant="h4" gutterBottom>*/}
-            {/*            {name}*/}
-            {/*        </Typography>*/}
-            {/*        <Typography variant="body1" gutterBottom>*/}
-            {/*            {description}*/}
-            {/*        </Typography>*/}
-            {/*        <Typography variant="body2" color="text.secondary">*/}
-            {/*            Category: {category}*/}
-            {/*        </Typography>*/}
-            {/*        <Typography variant="body1" color="text.primary">*/}
-            {/*            Quantity: {quantity}*/}
-            {/*        </Typography>*/}
-            {/*        <Typography variant="body1" color="text.primary">*/}
-            {/*            Price: {price} USD*/}
-            {/*        </Typography>*/}
-            {/*        <CardMedia*/}
-            {/*            component="img"*/}
-            {/*            height="300"*/}
-            {/*            image={validatedImage}*/}
-            {/*            alt={name}*/}
-            {/*            sx={{ objectFit: "contain", width: "100%" }}*/}
-            {/*        />*/}
-            {/*        <Button onClick={toggleModal} sx={{ mt: 2 }} variant="contained">*/}
-            {/*            Close*/}
-            {/*        </Button>*/}
-            {/*    </DialogContent>*/}
-            {/*</Dialog>*/}
         </>
     );
 };

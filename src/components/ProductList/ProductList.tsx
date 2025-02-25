@@ -1,19 +1,32 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '../../store/hooks';
 import {
-    Box, Grid, Pagination, IconButton, Button, Modal, TextField
+    Box,
+    Grid,
+    Pagination,
+    IconButton,
+    Button,
+    Modal,
+    TextField,
+    MenuItem,
+    Select,
+    FormControl,
+    InputLabel,
+    SelectChangeEvent
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ProductCard from '../Card/Card';
 import { RootState } from '../../store/store';
-import {deleteExistingProduct, addNewProduct} from '../../features/products/productSlice';
-import { Snackbar, Alert } from '@mui/material'; // Add these imports
-
+import { deleteExistingProduct, addNewProduct } from '../../features/products/productSlice';
+import { fetchCategories } from '../../features/categories/categorySlice'; // Import fetchCategories
+import { Snackbar, Alert } from '@mui/material';
 
 const ProductList: React.FC = () => {
-    const products = useSelector((state: RootState) => state.products.filteredProducts);
     const dispatch = useAppDispatch();
+    const products = useSelector((state: RootState) => state.products.filteredProducts);
+    const categories = useSelector((state: RootState) => state.categories.categories); // Fetch categories from Redux store
+
     const [currentPage, setCurrentPage] = useState(1);
     const [isModalOpen, setModalOpen] = useState(false);
     const [newProduct, setNewProduct] = useState({
@@ -24,11 +37,16 @@ const ProductList: React.FC = () => {
         price: ''
     });
 
-    const [snackbarOpen, setSnackbarOpen] = useState(false); // For notifications
-    const [snackbarMessage, setSnackbarMessage] = useState(''); // Notification message
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
 
     const itemsPerPage = 8;
+
+    // Fetch categories when the component mounts
+    useEffect(() => {
+        dispatch(fetchCategories());
+    }, [dispatch]);
 
     const handleChangePage = (_event: React.ChangeEvent<unknown>, page: number) => {
         setCurrentPage(page);
@@ -46,6 +64,10 @@ const ProductList: React.FC = () => {
         setNewProduct({ ...newProduct, [name]: value });
     };
 
+    const handleCategoryChange = (event: SelectChangeEvent) => {
+        setNewProduct({ ...newProduct, category: event.target.value });
+    };
+
     const handleAddProduct = async () => {
         if (newProduct.name && newProduct.quantity) {
             try {
@@ -60,9 +82,8 @@ const ProductList: React.FC = () => {
                 setSnackbarSeverity('success');
                 setSnackbarOpen(true);
                 handleCloseModal();
-            } catch  {
-                //alert(error);
-                setSnackbarMessage(`Failed to add product. Please try again.`);
+            } catch {
+                setSnackbarMessage('Failed to add product. Please try again.');
                 setSnackbarSeverity('error');
                 setSnackbarOpen(true);
             }
@@ -94,7 +115,8 @@ const ProductList: React.FC = () => {
             <Grid container spacing={0.5} justifyContent={products.length > 0 ? 'flex-start' : 'center'}>
                 {paginatedProducts.map((product) => (
                     <Grid item xs={12} sm={6} md={3} key={product.id}>
-                        <Box sx={{ position: 'relative',
+                        <Box sx={{
+                            position: 'relative',
                             transition: "transform 0.3s ease-in-out",
                             "&:hover": {
                                 transform: "scale(1.05)",
@@ -168,20 +190,26 @@ const ProductList: React.FC = () => {
                         onChange={handleInputChange}
                         margin="normal"
                     />
+                    <FormControl fullWidth margin="normal">
+                        <InputLabel>Category</InputLabel>
+                        <Select
+                            value={newProduct.category}
+                            onChange={handleCategoryChange}
+                            label="Category"
+                        >
+                            {categories.map((category) => (
+                                <MenuItem key={category.id} value={category.name}>
+                                    {category.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
                     <TextField
                         fullWidth
                         label="Quantity"
                         name="quantity"
                         type="number"
                         value={newProduct.quantity}
-                        onChange={handleInputChange}
-                        margin="normal"
-                    />
-                    <TextField
-                        fullWidth
-                        label="Category"
-                        name="category"
-                        value={newProduct.category}
                         onChange={handleInputChange}
                         margin="normal"
                     />

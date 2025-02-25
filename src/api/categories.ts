@@ -7,5 +7,5 @@ export const categoryApi = {
     getAll: async () => axios.get<ICategoryProps[]>(`${API_BASE}/categories`),
     create: async (category: Omit<ICategoryProps, 'id'>) => axios.post<ICategoryProps>(`${API_BASE}/categories`, category),
     update: async (id: number, category: ICategoryProps) => axios.put<ICategoryProps>(`${API_BASE}/categories?id=${id}`, category),
-    delete: async (id: number) => axios.delete<void>(`${API_BASE}/categories?id=${id}`)
+    delete: async (id: number) => axios.delete<void>(`${API_BASE}/categories/${id}`)
 };

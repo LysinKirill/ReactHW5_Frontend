@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
-import {addNewCategory, setCategories} from '../features/categories/categorySlice';
+import {addNewCategory, deleteCategory, setCategories} from '../features/categories/categorySlice';
 import {Button, Dialog, TextField, Box, Typography, List, ListItem, IconButton, Paper} from '@mui/material';
 import { ICategoryProps } from './ProductList/types.ts';
 import EditIcon from '@mui/icons-material/Edit';
@@ -68,8 +68,19 @@ const CategoriesPage: React.FC = () => {
         }
     };
 
-    const handleDeleteCategory = (id: number) => {
+    const handleDeleteCategory = async (id: number) => {
         const updatedCategories = categories.filter((cat) => cat.id !== id);
+        try {
+            await dispatch(deleteCategory(id)).unwrap();
+            setSnackbarMessage('Category deleted successfully!');
+            setSnackbarSeverity('success');
+            setSnackbarOpen(true);
+        } catch {
+            setSnackbarMessage('Failed to delete category. Please try again.');
+            setSnackbarSeverity('error');
+            setSnackbarOpen(true);
+        }
+
         dispatch(setCategories(updatedCategories));
     };
 

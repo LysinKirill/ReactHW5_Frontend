@@ -19,13 +19,13 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ProductCard from '../Card/Card';
 import { RootState } from '../../store/store';
 import { deleteExistingProduct, addNewProduct } from '../../features/products/productSlice';
-import { fetchCategories } from '../../features/categories/categorySlice'; // Import fetchCategories
+import { fetchCategories } from '../../features/categories/categorySlice';
 import { Snackbar, Alert } from '@mui/material';
 
 const ProductList: React.FC = () => {
     const dispatch = useAppDispatch();
     const products = useSelector((state: RootState) => state.products.filteredProducts);
-    const categories = useSelector((state: RootState) => state.categories.categories); // Fetch categories from Redux store
+    const categories = useSelector((state: RootState) => state.categories.categories);
 
     const [currentPage, setCurrentPage] = useState(1);
     const [isModalOpen, setModalOpen] = useState(false);
@@ -43,7 +43,6 @@ const ProductList: React.FC = () => {
 
     const itemsPerPage = 8;
 
-    // Fetch categories when the component mounts
     useEffect(() => {
         dispatch(fetchCategories());
     }, [dispatch]);

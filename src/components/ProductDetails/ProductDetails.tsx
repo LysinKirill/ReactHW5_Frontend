@@ -6,7 +6,7 @@ import {
     deleteExistingProduct,
     updateExistingProduct,
 } from '../../features/products/productSlice';
-import { fetchCategories } from '../../features/categories/categorySlice'; // Import fetchCategories
+import { fetchCategories } from '../../features/categories/categorySlice';
 import {
     Button,
     Typography,
@@ -31,12 +31,11 @@ const ProductDetails: React.FC = () => {
     const product = useSelector((state: RootState) =>
         state.products.products.find((p) => p.id === parseInt(id || ''))
     );
-    const categories = useSelector((state: RootState) => state.categories.categories); // Fetch categories from Redux store
+    const categories = useSelector((state: RootState) => state.categories.categories);
 
     const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [editedProduct, setEditedProduct] = useState<IProductProps>(product!);
 
-    // Fetch categories when the component mounts
     useEffect(() => {
         dispatch(fetchCategories());
     }, [dispatch]);

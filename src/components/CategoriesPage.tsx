@@ -34,7 +34,7 @@ const CategoriesPage: React.FC = () => {
     const handleAddCategorySave = async () => {
         if (newCategoryName.trim()) {
             try {
-                await dispatch(addNewCategory({ name: newCategoryName })).unwrap(); // unwrap() throws an error if the thunk fails
+                await dispatch(addNewCategory({ name: newCategoryName })).unwrap();
                 setSnackbarMessage('Category added successfully!');
                 setSnackbarSeverity('success');
                 setSnackbarOpen(true);

@@ -80,6 +80,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 transform: isOpen ? 'translateX(0)' : 'translateX(-100%)',
                 opacity: isOpen ? 1 : 0,
                 pointerEvents: isOpen ? 'auto' : 'none',
+                zIndex: 2,
             }}
         >
             <Box sx={{ mb: 2 }}>

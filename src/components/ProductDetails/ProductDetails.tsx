@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
-import { deleteProduct, updateProduct } from '../../features/products/productSlice';
+import {
+    deleteExistingProduct,
+    updateExistingProduct,
+} from '../../features/products/productSlice';
 import {Button, Typography, Box, TextField, Dialog, Paper} from '@mui/material';
 import {IProductProps} from "../ProductList/types.ts";
+import {useAppDispatch} from "../../store/hooks.ts";
 
 const ProductDetails: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
     const product = useSelector((state: RootState) =>
         state.products.products.find((p) => p.id === parseInt(id || ''))
@@ -23,12 +27,12 @@ const ProductDetails: React.FC = () => {
     const handleEdit = () => setEditModalOpen(true);
 
     const handleDelete = () => {
-        dispatch(deleteProduct(product.id));
+        dispatch(deleteExistingProduct(product.id));
         navigate('/products');
     };
 
     const handleSave = () => {
-        dispatch(updateProduct(editedProduct));
+        dispatch(updateExistingProduct(editedProduct));
         setEditModalOpen(false);
     };
 

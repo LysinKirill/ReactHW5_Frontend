@@ -1,20 +1,26 @@
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
-import { setCategories } from '../features/categories/categorySlice';
+import {addNewCategory, setCategories} from '../features/categories/categorySlice';
 import {Button, Dialog, TextField, Box, Typography, List, ListItem, IconButton, Paper} from '@mui/material';
 import { ICategoryProps } from './ProductList/types.ts';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { Snackbar, Alert } from '@mui/material';
+import {useAppDispatch} from "../store/hooks.ts";
 
 const CategoriesPage: React.FC = () => {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     const categories = useSelector((state: RootState) => state.categories.categories);
 
     const [isAddModalOpen, setAddModalOpen] = useState(false);
     const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [editedCategory, setEditedCategory] = useState<ICategoryProps | null>(null);
     const [newCategoryName, setNewCategoryName] = useState('');
+    const [snackbarOpen, setSnackbarOpen] = useState(false); // For notifications
+    const [snackbarMessage, setSnackbarMessage] = useState(''); // Notification message
+    const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
+
 
     const handleAddCategory = () => {
         setAddModalOpen(true);
@@ -25,14 +31,20 @@ const CategoriesPage: React.FC = () => {
         setNewCategoryName('');
     };
 
-    const handleAddCategorySave = () => {
+    const handleAddCategorySave = async () => {
         if (newCategoryName.trim()) {
-            const newCategory: ICategoryProps = {
-                id: Date.now(), // Using Date.now() for a unique ID for now
-                name: newCategoryName,
-            };
-            dispatch(setCategories([...categories, newCategory]));
-            handleCloseAddModal();
+            try {
+                await dispatch(addNewCategory({ name: newCategoryName })).unwrap(); // unwrap() throws an error if the thunk fails
+                setSnackbarMessage('Category added successfully!');
+                setSnackbarSeverity('success');
+                setSnackbarOpen(true);
+                handleCloseAddModal();
+            } catch (error) {
+                setSnackbarMessage('Failed to add category. Please try again.');
+                setSnackbarSeverity('error');
+                console.log(error);
+                setSnackbarOpen(true);
+            }
         }
     };
 
@@ -62,7 +74,17 @@ const CategoriesPage: React.FC = () => {
     };
 
     return (
+
         <Paper elevation={3} sx={{maxWidth: 800, margin: '20px auto', padding: 3}}>
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={6000}
+                onClose={() => setSnackbarOpen(false)}
+            >
+                <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         <Box sx={{ padding: 4 }}>
             <Typography variant="h4">Categories</Typography>
             <Button variant="contained" onClick={handleAddCategory} sx={{ mt: 2 }}>

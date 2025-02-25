@@ -110,6 +110,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ toggleSidebar }) => {
                             },
                             textTransform: 'none',
                         }}
+                        onClick={() => navigate('/user')}
                     >
                         User
                     </Button>

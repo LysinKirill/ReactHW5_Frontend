@@ -7,8 +7,9 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import ProductCard from '../Card/Card';
 import { RootState } from '../../store/store';
-import { deleteProduct, addProduct } from '../../features/products/productSlice';
-import {IProductProps} from "./types.ts";
+import {deleteExistingProduct, addNewProduct} from '../../features/products/productSlice';
+import { Snackbar, Alert } from '@mui/material'; // Add these imports
+
 
 const ProductList: React.FC = () => {
     const products = useSelector((state: RootState) => state.products.filteredProducts);
@@ -23,6 +24,10 @@ const ProductList: React.FC = () => {
         price: ''
     });
 
+    const [snackbarOpen, setSnackbarOpen] = useState(false); // For notifications
+    const [snackbarMessage, setSnackbarMessage] = useState(''); // Notification message
+    const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
+
     const itemsPerPage = 8;
 
     const handleChangePage = (_event: React.ChangeEvent<unknown>, page: number) => {
@@ -30,7 +35,7 @@ const ProductList: React.FC = () => {
     };
 
     const handleDeleteProduct = (id: number) => {
-        dispatch(deleteProduct(id));
+        dispatch(deleteExistingProduct(id));
     };
 
     const handleOpenModal = () => setModalOpen(true);
@@ -41,25 +46,26 @@ const ProductList: React.FC = () => {
         setNewProduct({ ...newProduct, [name]: value });
     };
 
-    const handleAddProduct = () => {
+    const handleAddProduct = async () => {
         if (newProduct.name && newProduct.quantity) {
-            const product : IProductProps = {
-                id: 0,
-                name: newProduct.name,
-                description: newProduct.description,
-                quantity: parseInt(newProduct.quantity),
-                category: newProduct.category,
-                price: parseInt(newProduct.price)
-            };
-            dispatch(addProduct(product));
-            setNewProduct({
-                name: newProduct.name,
-                description: newProduct.description,
-                quantity: newProduct.quantity,
-                category: newProduct.category,
-                price: newProduct.price
-            });
-            handleCloseModal();
+            try {
+                await dispatch(addNewProduct({
+                    name: newProduct.name,
+                    description: newProduct.description,
+                    quantity: parseInt(newProduct.quantity),
+                    category: newProduct.category,
+                    price: parseInt(newProduct.price)
+                })).unwrap();
+                setSnackbarMessage('Product added successfully!');
+                setSnackbarSeverity('success');
+                setSnackbarOpen(true);
+                handleCloseModal();
+            } catch  {
+                //alert(error);
+                setSnackbarMessage(`Failed to add product. Please try again.`);
+                setSnackbarSeverity('error');
+                setSnackbarOpen(true);
+            }
         }
     };
 
@@ -70,6 +76,15 @@ const ProductList: React.FC = () => {
 
     return (
         <Box sx={{ width: '100%', padding: 2 }}>
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={6000}
+                onClose={() => setSnackbarOpen(false)}
+            >
+                <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
             <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: 2 }}>
                 <Button variant="contained" color="primary" onClick={handleOpenModal}>
                     Add Product

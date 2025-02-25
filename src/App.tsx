@@ -5,15 +5,39 @@ import NavigationBar from './components/NavigationBar/NavigationBar.tsx';
 import ProductList from './components/ProductList/ProductList.tsx';
 import Sidebar from './components/Sidebar/Sidebar.tsx';
 import { useAppDispatch, useAppSelector } from './store/hooks';
-import { setFilteredProducts } from './features/products/productSlice';
-import { setCategories } from './features/categories/categorySlice';
+import {fetchProducts, setFilteredProducts} from './features/products/productSlice';
+import {fetchCategories, setCategories} from './features/categories/categorySlice';
 import { IProductProps } from "./components/ProductList/types.ts";
 import ProductDetails from "./components/ProductDetails/ProductDetails.tsx";
 import CategoriesPage from "./components/CategoriesPage.tsx";
 import UserProfile from "./components/UserProfile/UserProfile.tsx";
+import { Snackbar, Alert } from '@mui/material';
+import axios from "axios";
+
 
 const App: React.FC = () => {
+    const [apiAvailable, setApiAvailable] = useState(true);
     const dispatch = useAppDispatch();
+    useEffect(() => {
+        const checkApiHealth = async () => {
+            try {
+                console.log(`${import.meta.env.VITE_API_BASE_URL}/health`);
+                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/health`);
+                if (response.data !== 'OK' && response.data.status !== 200) {
+                    setApiAvailable(false);
+                }
+            } catch {
+                setApiAvailable(false);
+            }
+        };
+
+        checkApiHealth();
+    }, []);
+
+    useEffect(() => {
+        dispatch(fetchProducts());
+        dispatch(fetchCategories());
+    }, [dispatch]);
     const { categories, products, filteredProducts } = useAppSelector((state) => ({
         products: state.products.products,
         filteredProducts: state.products.filteredProducts,
@@ -77,6 +101,15 @@ const App: React.FC = () => {
 
     return (
         <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: '#101022', overflow: 'hidden', width: '100vw' }}>
+            <Snackbar
+                open={!apiAvailable}
+                autoHideDuration={6000}
+                onClose={() => setApiAvailable(true)}
+            >
+                <Alert severity="error">
+                    The API is not available. Please check your connection and try again.
+                </Alert>
+            </Snackbar>
             <NavigationBar toggleSidebar={toggleSidebar} />
             <Box sx={{ display: 'flex', flex: 1, marginTop: '64px', overflow: 'hidden', width: '100%' }}>
                 <Sidebar
@@ -103,13 +136,10 @@ const App: React.FC = () => {
 };
 
 const getUniqueCategories = (products: IProductProps[]) => {
-    const uniqueCategories = new Set<IProductProps>();
-
-    products.forEach((product) => {
-        uniqueCategories.add(product);
-    });
-
-    return Array.from(uniqueCategories);
+    return [...new Set(products.map(p => p.category))].map((name, index) => ({
+        id: index + 1,
+        name
+    }));
 };
 
 export default App;

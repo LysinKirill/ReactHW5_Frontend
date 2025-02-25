@@ -35,6 +35,15 @@ export const deleteCategory = createAsyncThunk('categories/delete', async (categ
     }
 });
 
+export const updateCategory = createAsyncThunk('categories/update', async (category: ICategoryProps, { rejectWithValue }) => {
+    try {
+        const response = await categoryApi.update(category.id, category);
+        return response.data;
+    } catch {
+        return rejectWithValue('Failed to update category');
+    }
+});
+
 const categorySlice = createSlice({
     name: 'categories',
     initialState,

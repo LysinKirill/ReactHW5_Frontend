@@ -5,15 +5,14 @@ import NavigationBar from './components/NavigationBar/NavigationBar.tsx';
 import ProductList from './components/ProductList/ProductList.tsx';
 import Sidebar from './components/Sidebar/Sidebar.tsx';
 import { useAppDispatch, useAppSelector } from './store/hooks';
-import {fetchProducts, setFilteredProducts} from './features/products/productSlice';
-import {fetchCategories, setCategories} from './features/categories/categorySlice';
+import { fetchProducts, setFilteredProducts } from './features/products/productSlice';
+import { fetchCategories, setCategories } from './features/categories/categorySlice';
 import { IProductProps } from "./components/ProductList/types.ts";
 import ProductDetails from "./components/ProductDetails/ProductDetails.tsx";
 import CategoriesPage from "./components/CategoriesPage.tsx";
 import UserProfile from "./components/UserProfile/UserProfile.tsx";
 import { Snackbar, Alert } from '@mui/material';
 import axios from "axios";
-
 
 const App: React.FC = () => {
     const [apiAvailable, setApiAvailable] = useState(true);
@@ -121,7 +120,18 @@ const App: React.FC = () => {
                     onResetFilters={handleResetFilters}
                     categories={categories.map(x => x.name)}
                 />
-                <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', padding: 2, backgroundColor: '#101022', overflow: 'hidden' }}>
+                <Box
+                    sx={{
+                        width: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        padding: 2,
+                        backgroundColor: '#101022',
+                        overflow: 'hidden',
+                        marginLeft: isSidebarOpen ? '15rem' : '0', // Adjust margin based on sidebar state
+                        transition: 'margin-left 0.3s ease-in-out', // Smooth transition
+                    }}
+                >
                     <Routes>
                         <Route path="/products/:id" element={<ProductDetails />} />
                         <Route path="/products" element={<ProductList />} />

@@ -30,19 +30,6 @@ const App: React.FC = () => {
                 dispatch(logout());
             }
         };
-
-        checkAuth();
-    }, [dispatch])
-
-    useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                await dispatch(refreshToken()).unwrap();
-            } catch (error) {
-                // Not logged in
-            }
-        };
-
         checkAuth();
     }, [dispatch]);
 

@@ -68,18 +68,19 @@ export const logout = createAsyncThunk('auth/logout', async () => {
 
 export const refreshToken = createAsyncThunk(
     'auth/refresh',
-    async (_, { rejectWithValue }) => {
+    async (_, { rejectWithValue, dispatch }) => {
         try {
             const response = await authApi.refresh();
-            localStorage.setItem('accessToken', response.data.accessToken);
-            return response.data.user;
+            const { accessToken, user } = response.data;
+            localStorage.setItem('accessToken', accessToken);
+            return user;
         } catch (error) {
             localStorage.removeItem('accessToken');
+            dispatch(logout());
             return rejectWithValue('Session expired');
         }
     }
 );
-
 
 const authSlice = createSlice({
     name: 'auth',

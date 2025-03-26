@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { authApi } from './auth';
-import { store } from '../store/store';
+//import { store } from '../store/store';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 

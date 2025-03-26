@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
+import AddIcon from '@mui/icons-material/Add';
+import CloseIcon from '@mui/icons-material/Close';
 import {addNewCategory, deleteCategory, setCategories, updateCategory} from '../features/categories/categorySlice';
 import {
     Button,
@@ -12,7 +14,7 @@ import {
     ListItem,
     IconButton,
     Paper,
-    FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText
+    FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText, OutlinedInput, InputAdornment
 } from '@mui/material';
 import { ICategoryProps } from './ProductList/types.ts';
 import EditIcon from '@mui/icons-material/Edit';
@@ -28,6 +30,8 @@ const CategoriesPage: React.FC = () => {
     const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [editedCategory, setEditedCategory] = useState<ICategoryProps | null>(null);
     const [newCategoryName, setNewCategoryName] = useState('');
+    const [newCategoryGroups, setNewCategoryGroups] = useState<string[]>(['admin']);
+    const [customGroup, setCustomGroup] = useState('');
     const [snackbarOpen, setSnackbarOpen] = useState(false); // For notifications
     const [snackbarMessage, setSnackbarMessage] = useState(''); // Notification message
     const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
@@ -38,22 +42,31 @@ const CategoriesPage: React.FC = () => {
     };
 
     const handleCloseAddModal = () => {
-        setAddModalOpen(false);
         setNewCategoryName('');
+        setNewCategoryGroups(['admin']);
+        setAddModalOpen(false);
     };
 
     const handleAddCategorySave = async () => {
         if (newCategoryName.trim()) {
             try {
-                await dispatch(addNewCategory({ name: newCategoryName })).unwrap();
+                await dispatch(addNewCategory({
+                    name: newCategoryName,
+                    allowed_groups: newCategoryGroups
+                })).unwrap();
+
                 setSnackbarMessage('Category added successfully!');
                 setSnackbarSeverity('success');
                 setSnackbarOpen(true);
                 handleCloseAddModal();
+
+                // Reset form
+                setNewCategoryName('');
+                setNewCategoryGroups(['admin']);
             } catch (error) {
                 setSnackbarMessage('Failed to add category. Please try again.');
                 setSnackbarSeverity('error');
-                console.log(error);
+                console.error(error);
                 setSnackbarOpen(true);
             }
         }
@@ -130,7 +143,6 @@ const CategoriesPage: React.FC = () => {
             </Snackbar>
         <Box sx={{ padding: 4 }}>
             <Typography variant="h4">Categories</Typography>
-            <Typography variant="h4">Categories</Typography>
             <Button variant="contained" onClick={handleAddCategory} sx={{ mt: 2 }}>
                 Add Category
             </Button>
@@ -164,6 +176,84 @@ const CategoriesPage: React.FC = () => {
                         onChange={(e) => setNewCategoryName(e.target.value)}
                         sx={{ mt: 2 }}
                     />
+                    <FormControl fullWidth sx={{ mt: 2 }}>
+                        <InputLabel>Allowed Groups</InputLabel>
+                        <Select
+                            multiple
+                            value={newCategoryGroups}
+                            onChange={(e) => setNewCategoryGroups(e.target.value as string[])}
+                            renderValue={(selected) => (selected as string[]).join(', ')}
+                            input={
+                                <OutlinedInput
+                                    label="Allowed Groups"
+                                    endAdornment={
+                                        <InputAdornment position="end">
+                                            <TextField
+                                                size="small"
+                                                placeholder="Add custom group"
+                                                value={customGroup}
+                                                onChange={(e) => setCustomGroup(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter' && customGroup.trim()) {
+                                                        if (!newCategoryGroups.includes(customGroup)) {
+                                                            setNewCategoryGroups([...newCategoryGroups, customGroup]);
+                                                        }
+                                                        setCustomGroup('');
+                                                        e.preventDefault();
+                                                    }
+                                                }}
+                                                InputProps={{
+                                                    endAdornment: customGroup && (
+                                                        <IconButton
+                                                            size="small"
+                                                            onClick={() => {
+                                                                if (customGroup.trim() && !newCategoryGroups.includes(customGroup)) {
+                                                                    setNewCategoryGroups([...newCategoryGroups, customGroup]);
+                                                                }
+                                                                setCustomGroup('');
+                                                            }}
+                                                        >
+                                                            <AddIcon fontSize="small" />
+                                                        </IconButton>
+                                                    )
+                                                }}
+                                            />
+                                        </InputAdornment>
+                                    }
+                                />
+                            }
+                        >
+                            {/* Predefined groups */}
+                            {['admin', 'manager', 'editor', 'user'].map((group) => (
+                                <MenuItem key={group} value={group}>
+                                    <Checkbox checked={newCategoryGroups.includes(group)} />
+                                    <ListItemText primary={group} />
+                                </MenuItem>
+                            ))}
+
+                            {/* Custom groups that have been added */}
+                            {newCategoryGroups
+                                .filter(group => !['admin', 'manager', 'editor', 'user'].includes(group))
+                                .map((group) => (
+                                    <MenuItem key={group} value={group}>
+                                        <Checkbox checked={newCategoryGroups.includes(group)} />
+                                        <ListItemText primary={group} />
+                                        <IconButton
+                                            edge="end"
+                                            size="small"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setNewCategoryGroups(newCategoryGroups.filter(g => g !== group));
+                                            }}
+                                        >
+                                            <CloseIcon fontSize="small" />
+                                        </IconButton>
+                                    </MenuItem>
+                                ))
+                            }
+                        </Select>
+                    </FormControl>
+
                     <Button variant="contained" onClick={handleAddCategorySave} sx={{ mt: 2 }}>
                         Save
                     </Button>
@@ -171,7 +261,6 @@ const CategoriesPage: React.FC = () => {
             </Dialog>
 
 
-            // Update your edit modal to include allowed_groups
             <Dialog open={isEditModalOpen} onClose={handleCloseEditModal}>
                 <Box sx={{ padding: 4 }}>
                     <Typography variant="h6">Edit Category</Typography>

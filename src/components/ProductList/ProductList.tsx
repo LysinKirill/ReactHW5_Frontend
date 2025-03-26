@@ -26,7 +26,8 @@ const ProductList: React.FC = () => {
     const dispatch = useAppDispatch();
     const products = useSelector((state: RootState) => {
         const userGroup = state.auth.user?.group;
-        return state.products.products.filter(product => {
+
+        return state.products.filteredProducts.filter(product => {
             const category = state.categories.categories.find(c => c.name === product.category);
             return !category ||
                 userGroup === 'admin' ||
@@ -54,6 +55,7 @@ const ProductList: React.FC = () => {
     useEffect(() => {
         dispatch(fetchCategories());
     }, [dispatch]);
+
 
     const handleChangePage = (_event: React.ChangeEvent<unknown>, page: number) => {
         setCurrentPage(page);

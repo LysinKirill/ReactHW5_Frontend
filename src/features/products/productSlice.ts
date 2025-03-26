@@ -58,13 +58,17 @@ const productSlice = createSlice({
             })
             .addCase(addNewProduct.fulfilled, (state, action) => {
                 state.products.push(action.payload);
+                state.filteredProducts.push(action.payload)
             })
             .addCase(updateExistingProduct.fulfilled, (state, action) => {
                 const index = state.products.findIndex(p => p.id === action.payload.id);
+                const filteredIndex = state.filteredProducts.findIndex(p => p.id === action.payload.id);
                 if (index !== -1) state.products[index] = action.payload;
+                if (filteredIndex !== -1) state.filteredProducts[index] = action.payload;
             })
             .addCase(deleteExistingProduct.fulfilled, (state, action) => {
                 state.products = state.products.filter(p => p.id !== action.payload);
+                state.filteredProducts = state.filteredProducts.filter(p => p.id !== action.payload);
             });
     }
 });

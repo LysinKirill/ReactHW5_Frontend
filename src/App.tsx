@@ -6,8 +6,7 @@ import ProductList from './components/ProductList/ProductList.tsx';
 import Sidebar from './components/Sidebar/Sidebar.tsx';
 import { useAppDispatch, useAppSelector } from './store/hooks';
 import { fetchProducts, setFilteredProducts } from './features/products/productSlice';
-import { fetchCategories, setCategories } from './features/categories/categorySlice';
-import { IProductProps } from "./components/ProductList/types.ts";
+import { fetchCategories } from './features/categories/categorySlice';
 import ProductDetails from "./components/ProductDetails/ProductDetails.tsx";
 import CategoriesPage from "./components/CategoriesPage.tsx";
 import UserProfile from "./components/UserProfile/UserProfile.tsx";
@@ -26,7 +25,7 @@ const App: React.FC = () => {
         const checkAuth = async () => {
             try {
                 await dispatch(refreshToken()).unwrap();
-            } catch (error) {
+            } catch {
                 dispatch(logout());
             }
         };
@@ -55,7 +54,7 @@ const App: React.FC = () => {
         dispatch(fetchCategories());
     }, [dispatch]);
 
-    const { categories, products, filteredProducts } = useAppSelector((state) => ({
+    const { categories, products } = useAppSelector((state) => ({
         products: state.products.products,
         filteredProducts: state.products.filteredProducts,
         categories: state.categories.categories,
@@ -112,10 +111,6 @@ const App: React.FC = () => {
         dispatch(setFilteredProducts(products));
     };
 
-    useEffect(() => {
-        dispatch(setCategories(getUniqueCategories(products)));
-    }, [dispatch, products, filteredProducts]);
-
     return (
         <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: '#101022', overflow: 'hidden', width: '100vw' }}>
             <Snackbar
@@ -169,13 +164,6 @@ const App: React.FC = () => {
             </Box>
         </Box>
     );
-};
-
-const getUniqueCategories = (products: IProductProps[]) => {
-    return [...new Set(products.map(p => p.category))].map((name, index) => ({
-        id: index + 1,
-        name
-    }));
 };
 
 export default App;

@@ -60,13 +60,11 @@ const CategoriesPage: React.FC = () => {
                 setSnackbarOpen(true);
                 handleCloseAddModal();
 
-                // Reset form
                 setNewCategoryName('');
                 setNewCategoryGroups(['admin']);
-            } catch (error) {
+            } catch {
                 setSnackbarMessage('Failed to add category. Please try again.');
                 setSnackbarSeverity('error');
-                console.error(error);
                 setSnackbarOpen(true);
             }
         }

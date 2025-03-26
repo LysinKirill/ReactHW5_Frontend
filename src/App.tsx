@@ -36,7 +36,6 @@ const App: React.FC = () => {
     useEffect(() => {
         const checkApiHealth = async () => {
             try {
-                console.log(`${import.meta.env.VITE_API_BASE_URL}/health`);
                 const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/health`);
                 if (response.data !== 'OK' && response.data.status !== 200) {
                     setApiAvailable(false);

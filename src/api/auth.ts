@@ -16,5 +16,6 @@ export const authApi = {
         username: string;
         email: string;
         password: string;
+        avatar_url: string;
     }) => axios.post(`${API_BASE}/auth/register`, userData, { withCredentials: true }),
 };

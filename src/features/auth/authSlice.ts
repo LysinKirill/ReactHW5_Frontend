@@ -22,7 +22,7 @@ const initialState: AuthState = {
 
 export const register = createAsyncThunk(
     'auth/register',
-    async (userData: { username: string; email: string; password: string }, { rejectWithValue }) => {
+    async (userData: { username: string; email: string; password: string, avatar_url: string }, { rejectWithValue }) => {
         try {
             const response = await authApi.register(userData);
             if(response.status != 204 && response.status != 201) {
@@ -53,10 +53,9 @@ export const login = createAsyncThunk(
     async (credentials: { username: string; password: string }, { rejectWithValue }) => {
         try {
             const response = await authApi.login(credentials);
-            console.log("SET ACCESS TOKEN");
             localStorage.setItem('accessToken', response.data.accessToken);
             return response.data.user;
-        } catch (error) {
+        } catch {
             return rejectWithValue('Login failed');
         }
     }
@@ -74,7 +73,7 @@ export const refreshToken = createAsyncThunk(
             const { accessToken, user } = response.data;
             localStorage.setItem('accessToken', accessToken);
             return user;
-        } catch (error) {
+        } catch  {
             localStorage.removeItem('accessToken');
             dispatch(logout());
             return rejectWithValue('Session expired');

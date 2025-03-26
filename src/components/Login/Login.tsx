@@ -15,7 +15,6 @@ const Login: React.FC = () => {
         e.preventDefault();
         const result = await dispatch(login({ username, password }));
         if (login.fulfilled.match(result)) {
-            console.log("NAVIGATE TO MAIN");
             navigate('/');
         }
     };

@@ -2,7 +2,18 @@ import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import {addNewCategory, deleteCategory, setCategories, updateCategory} from '../features/categories/categorySlice';
-import {Button, Dialog, TextField, Box, Typography, List, ListItem, IconButton, Paper} from '@mui/material';
+import {
+    Button,
+    Dialog,
+    TextField,
+    Box,
+    Typography,
+    List,
+    ListItem,
+    IconButton,
+    Paper,
+    FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText
+} from '@mui/material';
 import { ICategoryProps } from './ProductList/types.ts';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -96,6 +107,15 @@ const CategoriesPage: React.FC = () => {
         dispatch(setCategories(updatedCategories));
     };
 
+    const user = useSelector((state: RootState) => state.auth.user);
+
+    const canEditCategory = (category: ICategoryProps) => {
+        if(user == null)
+            return false;
+        return user?.group === 'admin' ||
+            (category.allowed_groups && category.allowed_groups.includes(user.group));
+    };
+
     return (
 
         <Paper elevation={3} sx={{maxWidth: 800, margin: '20px auto', padding: 3}}>
@@ -110,6 +130,7 @@ const CategoriesPage: React.FC = () => {
             </Snackbar>
         <Box sx={{ padding: 4 }}>
             <Typography variant="h4">Categories</Typography>
+            <Typography variant="h4">Categories</Typography>
             <Button variant="contained" onClick={handleAddCategory} sx={{ mt: 2 }}>
                 Add Category
             </Button>
@@ -118,12 +139,16 @@ const CategoriesPage: React.FC = () => {
                 {categories.map((category) => (
                     <ListItem key={category.id}>
                         <Typography variant="body1">{category.name}</Typography>
-                        <IconButton onClick={() => handleEditCategory(category)}>
-                            <EditIcon />
-                        </IconButton>
-                        <IconButton onClick={() => handleDeleteCategory(category.id)}>
-                            <DeleteIcon />
-                        </IconButton>
+                        {canEditCategory(category) && (
+                            <>
+                                <IconButton onClick={() => handleEditCategory(category)}>
+                                    <EditIcon />
+                                </IconButton>
+                                <IconButton onClick={() => handleDeleteCategory(category.id)}>
+                                    <DeleteIcon />
+                                </IconButton>
+                            </>
+                        )}
                     </ListItem>
                 ))}
             </List>
@@ -146,6 +171,7 @@ const CategoriesPage: React.FC = () => {
             </Dialog>
 
 
+            // Update your edit modal to include allowed_groups
             <Dialog open={isEditModalOpen} onClose={handleCloseEditModal}>
                 <Box sx={{ padding: 4 }}>
                     <Typography variant="h6">Edit Category</Typography>
@@ -161,6 +187,27 @@ const CategoriesPage: React.FC = () => {
                         }
                         sx={{ mt: 2 }}
                     />
+                    <FormControl fullWidth sx={{ mt: 2 }}>
+                        <InputLabel>Allowed Groups</InputLabel>
+                        <Select
+                            multiple
+                            value={editedCategory?.allowed_groups || []}
+                            onChange={(e) =>
+                                setEditedCategory({
+                                    ...editedCategory!,
+                                    allowed_groups: e.target.value as string[],
+                                })
+                            }
+                            renderValue={(selected) => (selected as string[]).join(', ')}
+                        >
+                            {['admin', 'manager', 'user'].map((group) => (
+                                <MenuItem key={group} value={group}>
+                                    <Checkbox checked={editedCategory?.allowed_groups?.includes(group) || false} />
+                                    <ListItemText primary={group} />
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
                     <Button variant="contained" onClick={handleEditCategorySave} sx={{ mt: 2 }}>
                         Save
                     </Button>

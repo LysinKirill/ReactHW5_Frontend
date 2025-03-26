@@ -16,4 +16,5 @@ export interface ProductListProps {
 export interface ICategoryProps {
     id: number;
     name: string;
+    allowed_groups: string[]
 }

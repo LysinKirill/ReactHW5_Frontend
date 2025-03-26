@@ -13,7 +13,7 @@ import CategoriesPage from "./components/CategoriesPage.tsx";
 import UserProfile from "./components/UserProfile/UserProfile.tsx";
 import { Snackbar, Alert } from '@mui/material';
 import axios from "axios";
-import {refreshToken} from "./features/auth/authSlice.ts";
+import {logout, refreshToken} from "./features/auth/authSlice.ts";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
 import Login from "./components/Login/Login.tsx";
 import Register from "./components/Register/Register.tsx";
@@ -27,12 +27,25 @@ const App: React.FC = () => {
             try {
                 await dispatch(refreshToken()).unwrap();
             } catch (error) {
+                dispatch(logout());
+            }
+        };
+
+        checkAuth();
+    }, [dispatch])
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                await dispatch(refreshToken()).unwrap();
+            } catch (error) {
                 // Not logged in
             }
         };
 
         checkAuth();
     }, [dispatch]);
+
 
     useEffect(() => {
         const checkApiHealth = async () => {
@@ -157,10 +170,12 @@ const App: React.FC = () => {
                             <Route path="/products/:id" element={<ProductDetails />} />
                             <Route path="/products" element={<ProductList />} />
                             <Route path="/" element={<ProductList />} />
-                            <Route element={<ProtectedRoute allowedGroups={['admin']} />}>
-                                <Route path="/categories" element={<CategoriesPage />} />
-                            </Route>
                             <Route path="/user" element={<UserProfile />} />
+                        </Route>
+
+                        {/* Admin-only route */}
+                        <Route element={<ProtectedRoute allowedGroups={['admin']} />}>
+                            <Route path="/categories" element={<CategoriesPage />} />
                         </Route>
                     </Routes>
                 </Box>

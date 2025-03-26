@@ -53,6 +53,7 @@ export const login = createAsyncThunk(
     async (credentials: { username: string; password: string }, { rejectWithValue }) => {
         try {
             const response = await authApi.login(credentials);
+            console.log("SET ACCESS TOKEN");
             localStorage.setItem('accessToken', response.data.accessToken);
             return response.data.user;
         } catch (error) {
@@ -70,12 +71,15 @@ export const refreshToken = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             const response = await authApi.refresh();
+            localStorage.setItem('accessToken', response.data.accessToken);
             return response.data.user;
         } catch (error) {
+            localStorage.removeItem('accessToken');
             return rejectWithValue('Session expired');
         }
     }
 );
+
 
 const authSlice = createSlice({
     name: 'auth',

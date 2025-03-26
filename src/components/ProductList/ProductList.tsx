@@ -24,7 +24,15 @@ import { Snackbar, Alert } from '@mui/material';
 
 const ProductList: React.FC = () => {
     const dispatch = useAppDispatch();
-    const products = useSelector((state: RootState) => state.products.filteredProducts);
+    const products = useSelector((state: RootState) => {
+        const userGroup = state.auth.user?.group;
+        return state.products.products.filter(product => {
+            const category = state.categories.categories.find(c => c.name === product.category);
+            return !category ||
+                userGroup === 'admin' ||
+                (category.allowed_groups && category.allowed_groups.includes(userGroup));
+        });
+    });
     const categories = useSelector((state: RootState) => state.categories.categories);
 
     const [currentPage, setCurrentPage] = useState(1);

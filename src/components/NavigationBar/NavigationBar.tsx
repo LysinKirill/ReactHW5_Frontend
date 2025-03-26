@@ -1,13 +1,24 @@
 ﻿import React from 'react';
 import { AppBar, Toolbar, Button, Box } from '@mui/material';
 import {useNavigate} from "react-router-dom";
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { logout } from '../../features/auth/authSlice';
 
 interface NavigationBarProps {
     toggleSidebar: () => void;
 }
 
+
+
 const NavigationBar: React.FC<NavigationBarProps> = ({ toggleSidebar }) => {
     const navigate = useNavigate()
+
+    const dispatch = useAppDispatch();
+    const user = useAppSelector((state) => state.auth.user);
+
+    const handleLogout = () => {
+        dispatch(logout());
+    };
 
     return (
         <AppBar
@@ -114,6 +125,15 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ toggleSidebar }) => {
                     >
                         User
                     </Button>
+                    {user ? (
+                        <Button onClick={handleLogout} sx={{ /* styles */ }}>
+                            Logout ({user.username})
+                        </Button>
+                    ) : (
+                        <Button onClick={() => navigate('/login')} sx={{ /* styles */ }}>
+                            Login
+                        </Button>
+                    )}
                 </Box>
             </Toolbar>
         </AppBar>

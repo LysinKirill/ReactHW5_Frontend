@@ -13,10 +13,27 @@ import CategoriesPage from "./components/CategoriesPage.tsx";
 import UserProfile from "./components/UserProfile/UserProfile.tsx";
 import { Snackbar, Alert } from '@mui/material';
 import axios from "axios";
+import {refreshToken} from "./features/auth/authSlice.ts";
+import ProtectedRoute from "./components/ProtectedRoute.tsx";
+import Login from "./components/Login/Login.tsx";
+import Register from "./components/Register/Register.tsx";
 
 const App: React.FC = () => {
     const [apiAvailable, setApiAvailable] = useState(true);
     const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                await dispatch(refreshToken()).unwrap();
+            } catch (error) {
+                // Not logged in
+            }
+        };
+
+        checkAuth();
+    }, [dispatch]);
+
     useEffect(() => {
         const checkApiHealth = async () => {
             try {
@@ -37,6 +54,7 @@ const App: React.FC = () => {
         dispatch(fetchProducts());
         dispatch(fetchCategories());
     }, [dispatch]);
+
     const { categories, products, filteredProducts } = useAppSelector((state) => ({
         products: state.products.products,
         filteredProducts: state.products.filteredProducts,
@@ -133,11 +151,17 @@ const App: React.FC = () => {
                     }}
                 >
                     <Routes>
-                        <Route path="/products/:id" element={<ProductDetails />} />
-                        <Route path="/products" element={<ProductList />} />
-                        <Route path="/" element={<ProductList />} />
-                        <Route path="/categories" element={<CategoriesPage />} />
-                        <Route path="/user" element={<UserProfile name="Sample fullname" email="sample_email@gmail.com" group="sample group" avatarUrl="/src/assets/priemlemo.png" />} />
+                        <Route path="/login" element={<Login/>} />
+                        <Route path="/register" element={<Register/>} />
+                        <Route element={<ProtectedRoute />}>
+                            <Route path="/products/:id" element={<ProductDetails />} />
+                            <Route path="/products" element={<ProductList />} />
+                            <Route path="/" element={<ProductList />} />
+                            <Route element={<ProtectedRoute allowedGroups={['admin']} />}>
+                                <Route path="/categories" element={<CategoriesPage />} />
+                            </Route>
+                            <Route path="/user" element={<UserProfile />} />
+                        </Route>
                     </Routes>
                 </Box>
             </Box>

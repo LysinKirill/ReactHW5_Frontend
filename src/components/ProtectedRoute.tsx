@@ -22,7 +22,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     }
 
     if (allowedGroups && !allowedGroups.includes(user.group) && user.group !== 'admin') {
-        return <UnauthorizedPage requiredGroups={requiredGroups} />;
+        return <UnauthorizedPage requiredGroups={[...new Set(requiredGroups.concat('admin'))]} />;
     }
 
     return <Outlet />;

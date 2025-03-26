@@ -1,50 +1,83 @@
-# React + TypeScript + Vite
+# Product Management System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack application with role-based access control for managing products and categories.
 
-Currently, two official plugins are available:
+![Application Screenshot](screenshots/application.png)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Key Features
 
-## Expanding the ESLint configuration
+- **User authentication** (register/login/logout)
+- **Role-based permissions** (admin, editor, user)
+- **Product management** (create, view, edit, delete)
+- **Category management** with group restrictions
+- **User profile** with personal information
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Getting Started
 
-- Configure the top-level `parserOptions` property like this:
+### 1. Account Creation
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+To create an admin account (for demonstration purposes):
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+1. Navigate to the registration page
+2. Fill in your details:
+    - Username: `admin`
+    - Email: `admin@example.com`
+    - Password: `securepassword`
+    - Group: Select "custom" and enter `admin`
+3. Click "Register"
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+![Registration Screenshot](screenshots/register.png)
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+> **Note**: In a production environment, admin accounts should be created through secure backend processes only.
+
+### 2. Role-Based Access Demonstration
+
+#### Admin Privileges
+- Can access all categories and products
+- Can create/edit/delete any category
+- Can manage user permissions
+
+
+### 3. Category Management Flow
+
+1. **Admin creates categories**:
+    - Specify which user groups can access each category
+    - Example: Create "Electronics" category accessible only to "admin" and "editor" groups
+
+![Category Creation](screenshots/cat_edit.png)
+![Category Creation](screenshots/cat_add.png)
+
+2. **Regular user experience**:
+    - Only sees categories they have access to
+    - Restricted from editing category permissions
+
+![User View](placeholder://user-view.png)
+
+### 4. Product Management
+
+All users can:
+- View products in accessible categories
+- See product details
+
+Privileged users can:
+- Create new products in permitted categories
+- Edit/delete existing products
+
+![Product Creation](screenshots/products.png)
+![Product Creation](screenshots/add_product.png)
+
+### 5. User Profile
+
+- View personal information
+- See assigned group/permissions
+- Update avatar image
+
+![Profile Page](screenshots/profile.png)
+
+## Technical Highlights
+
+- **Frontend**: React with TypeScript, Material-UI
+- **State Management**: Redux Toolkit
+- **Authentication**: JWT with refresh tokens
+- **Role System**: Granular category-level permissions
+- **Responsive Design**: Works on all device sizes
